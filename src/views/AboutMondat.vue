@@ -52,12 +52,12 @@ var fileNames = [
 
 var users = []
 for (let i = 0; i < 3; i++) {
-  users.push({name: userNames[Math.floor(Math.random()*userNames.length)]})
+  users.push({name: userNames[Math.floor(Math.random()*userNames.length)], id: i, rules: Math.floor(Math.random()*7)})
 }
 
 var objects = []
 for (let i = 0; i < 5; i++) {
-  objects.push({name: fileNames[Math.floor(Math.random()*fileNames.length)]})
+  objects.push({id: i, name: fileNames[Math.floor(Math.random()*fileNames.length)], rules: Math.floor(Math.random()*7)})
 }
 
 export default {
@@ -85,9 +85,6 @@ export default {
     }
   },
   computed:{
-    computedUsers() {
-     return  users.map(user => ({name: user.name, objects: objects.map(obj => ({name: obj.name, rules: Math.floor(Math.random()*7)}))}))
-    }
   }
 }
 </script>

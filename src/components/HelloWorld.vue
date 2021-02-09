@@ -1,164 +1,89 @@
 <template>
   <v-container>
     <v-row>
-      <h2>Доброго времени суток от Мансура</h2>
+      <v-col>
+        <h2>Доброго времени суток от Мансура</h2>
+        <br>
+        <h1>Ключ К = 4172536</h1></v-col>
     </v-row>
     <v-row class="d-flex row mx-auto my-2">
-      <v-btn @click="first">
-        Посчитать f1() = 00001111
-      </v-btn>
-      <v-btn @click="second">
-        Посчитать f2() = 11110001
-      </v-btn>
+<!--      <v-btn @click="first">-->
+<!--        Посчитать f1() = 00001111-->
+<!--      </v-btn>-->
+<!--      <v-btn @click="second">-->
+<!--        Посчитать f2() = 11110001-->
+<!--      </v-btn>-->
     </v-row>
     <v-row class="d-flex row mx-auto my-2">
-      <v-text-field type="text" v-model="input" />
-      <v-btn @click="culc">
-        Посчитать свое
-      </v-btn>
-      <v-btn @click="download">
-        Скачать
-      </v-btn>
+      <v-col cols="8">
+        <v-text-field type="text" v-model="input"/>
+      </v-col>
+      <v-col cols="2">
+        <v-btn @click="cript">
+          Защифровать
+        </v-btn>
+      </v-col>
+      <v-col cols="2">
+        <v-btn @click="decript">
+          Дещифровать
+        </v-btn>
+      </v-col>
+<!--      <v-btn @click="download">-->
+<!--        Скачать-->
+<!--      </v-btn>-->
     </v-row>
-    <v-card>
-      <div>
-        <div v-for="(line, index) in truthTable" :key="index">
-          <div
-            style="
-    display: flex;
-    flex-direction: row;"
-          >
-            <p style="margin: 3px;" v-for="(sel, ind) in line" :key="ind">
-              {{ sel }}
-            </p>
-          </div>
-        </div>
-      </div>
-      <p>
-        {{ formattedSDNF }}
-      </p>
-      <p>
-        {{ formattedSKNF }}
-      </p>
-    </v-card>
+    <h3>{{spliting}}</h3>
+    <h3>{{cripted}}</h3>
+    <h3>{{decripted}}</h3>
   </v-container>
 </template>
 
 <script>
+import _ from "lodash";
 export default {
   name: "HelloWorld",
   data() {
     return {
+      maping: "4172536",
       input: "",
-      truthTable: [],
-      SDNF: "",
-      SKNF: "",
-      symbols: ["x", "y", "z", "a", "b", "c"]
+      spliting: [],
+      cripted: "",
+      decripted: ""
     };
   },
   computed: {
-    formattedSDNF: {
-      get() {
-        return this.SDNF ? "СДНФ = " + this.SDNF : "";
-      }
+    arrMaping() {
+      return this.maping.split("")
     },
-    formattedSKNF: {
-      get() {
-        return this.SKNF ? "СКНФ = " + this.SKNF : "";
-      }
-    },
-
-    numberOfColums: {
-      get() {
-        return Math.log(this.input.length) / Math.log(2); // ВВОДИМ КОЛ-ВА ПЕРЕМЕННЫХ И, ОДНОВРЕМЕННО, КОЛ-ВА СТОЛБЦОВ
-      }
-    },
-    numberOfLines: {
-      get() {
-        return Math.pow(2, this.numberOfColums); // КОЛ-ВО СТРОК В МАТРИЦЕ
-      }
-    }
   },
   methods: {
-    first: function() {
-      this.input = "00001111";
+    cript() {
       this.culc();
+      const newSplited = this.spliting.map(el => {
+        return this.arrMaping.map(key => el[Number(key)-1])
+      })
+      this.cripted = newSplited.map(str => str.join("")).join("-");
     },
-    second: function() {
-      this.input = "11110001";
+    decript() {
       this.culc();
+      console.log(this.spliting);
+      const newSplited = this.spliting.map(el => {
+        return el.map((simbol, index) => el[this.arrMaping.findIndex(key => Number(key)-1 === index)])
+      })
+      this.decripted = newSplited.map(str => str.join("")).join("-");
     },
-    culc: function() {
-      let test = [];
-      test[0] = [];
-      for (let a = 0; a <= this.numberOfColums; a++) {
-        if (a < this.numberOfColums) {
-          test[0][a] = this.symbols[a];
-        } else {
-          test[0][a] = "f()";
+    culc() {
+      let workInput = this.input;
+      const stringLen = this.input.length;
+      const isSeven = stringLen%7;
+      if (!(isSeven === 0)) {
+        for (let i = 0; i < (7- isSeven); i++) {
+          workInput+="*";
         }
       }
-      for (let j = 0; j < this.numberOfLines; j++) {
-        test[j + 1] = [];
-        for (let i = 0; i <= this.numberOfColums; i++) {
-          if (i !== this.numberOfColums) {
-            if (
-              (j + 1) % Math.pow(2, this.numberOfColums - i) <=
-                Math.pow(2, this.numberOfColums - i) / 2 &&
-              (j + 1) % Math.pow(2, this.numberOfColums - i) !== 0
-            ) {
-              test[j + 1][i] = "0";
-            } else {
-              test[j + 1][i] = "1";
-            }
-          } else {
-            test[j + 1][i] = this.input.charAt(j);
-          }
-        }
-      }
-      this.truthTable = test;
-      this.SDNF = this.getSDNF();
-      this.SKNF = this.getSKNF();
-    },
-    getSDNF: function() {
-      let res = "";
-      let funcValues = this.input.split("");
-      for (let i = 0; i < funcValues.length; i++) {
-        for (let j = 0; funcValues[i] === "1" && j < this.numberOfColums; j++) {
-          res +=
-            this.truthTable[i][j] === "0"
-              ? "!" + this.symbols[j]
-              : this.symbols[j];
-          if (j === this.numberOfColums - 1) {
-            res += " | ";
-          }
-        }
-      }
-      return res.length === 0 ? res : res.substring(0, res.length - 3);
-    },
-    getSKNF: function() {
-      let res = "";
-      let funcValues = this.input.split("");
-      let k = 1;
-      for (let i = 0; i < funcValues.length; i++) {
-        for (let j = 0; funcValues[i] === "0" && j < this.numberOfColums; j++) {
-          if (k === 1) {
-            res += "(";
-            k = 0;
-          }
-          res +=
-            this.truthTable[i][j] === "1"
-              ? "!" + this.symbols[j]
-              : this.symbols[j];
-          if (j === this.numberOfColums - 1) {
-            res += ") & ";
-          } else {
-            res += " | ";
-          }
-        }
-        k = 1;
-      }
-      return res.length === 0 ? res : res.substring(0, res.length - 3);
+      const allSimbols = workInput.split("");
+      console.log({ workInput, stringLen, isSeven, allSimbols });
+      this.spliting = _.chunk(allSimbols, 7);
     },
     download: function() {
       if (this.input) {
