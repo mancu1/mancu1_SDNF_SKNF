@@ -19,10 +19,10 @@
 <!--            {{!(selectedObject.rules & 2)}}-->
             <v-btn :disabled="!(selectedObject.rules & 2)">Записать Изменения</v-btn>
           </v-col>
-          <v-col>
-<!--            {{!(selectedObject.rules & 1)}}-->
-            <v-btn :disabled="!(selectedObject.rules & 1)">Передать права</v-btn>
-          </v-col>
+<!--          <v-col>-->
+<!--           {{!(selectedObject.rules & 1)}}-->
+<!--            <v-btn :disabled="!(selectedObject.rules & 1)">Передать права</v-btn>-->
+<!--          </v-col>-->
         </v-row>
       </div>
     </div>
